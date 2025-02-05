@@ -2,3 +2,8 @@
 Warhammer 40,000: Darktide Mod. Removes the crossed out section.
 - Skull divider (between hint and prompt)
 - Next hint prompt
+
+# Installation
+Install like any other mod. The mod is load order agnostic.
+
+See the [DMF guide](https://dmf-docs.darkti.de/#/installing-mods) for manual installation.
