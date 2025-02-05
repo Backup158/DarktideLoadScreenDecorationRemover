@@ -1,8 +1,22 @@
 local mod = get_mod("LoadScreenDecorationRemover")
 mod.version = "1.0"
-mod:info("LoadScreenDecorationRemover v" .. mod.version .. " loaded uwu nya :3")
+
+--disableDivider = true
+--disablePrompt = true
+
+mod.on_all_mods_loaded = function()
+    mod:info("LoadScreenDecorationRemover v" .. mod.version .. " loaded uwu nya :3")
+end
+
+--mod.on_setting_changed = function()
+--    disableDivider = mod:get(toggle_divider)
+--    disablePrompt = mod:get(toggle_prompt)
+--end
 
 
+-- #################################################################################
+--                              Hooker Removal
+-- #################################################################################
 local definition_path = "scripts/ui/views/loading_view/loading_view_definitions"
 local UIWidget = require("scripts/managers/ui/ui_widget")
 mod:hook_require("scripts/ui/views/loading_view/loading_view", function(LoadingView)
