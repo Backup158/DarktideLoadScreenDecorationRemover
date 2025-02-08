@@ -3,7 +3,7 @@ return {
         en = "Load Screen Decoration Remover",
     },
     mod_description = {
-        en = "Removes non-background decorations from loading screens.",
+        en = "Removes non-background decorations from loading screens. Changes do NOT take effect until game restart/reload.",
     },
     toggle_divider = {
         en = "Hide Divider",
