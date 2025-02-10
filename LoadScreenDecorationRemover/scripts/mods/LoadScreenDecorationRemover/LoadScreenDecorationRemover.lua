@@ -1,33 +1,51 @@
 local mod = get_mod("LoadScreenDecorationRemover")
 mod.version = "1.0"
+-- Requirements for hint/divider/prompt
 local definition_path = "scripts/ui/views/loading_view/loading_view_definitions"
 local UIWidget = require("scripts/managers/ui/ui_widget")
 local LoadingView = require("scripts/ui/views/loading_view/loading_view")
+-- Requirements for reason/skull
+local LoadingReason = require("scripts/ui/loading_reason")
+local UIManager = require("scripts/managers/ui/ui_manager")
 
 -- #################################################################################
 --                              Hooker Removal
+-- NOTE: Using conditionals inside a hook causes a syntax error. I think it's because of the 'end' of the if being confused for the 'end)' of the hook arguments
 -- #################################################################################
 mod.on_all_mods_loaded = function()
     mod:info("LoadScreenDecorationRemover v" .. mod.version .. " loaded uwu nya :3")
+    local userToggledHint = mod:get("toggle_hint")
+    local userToggledDivider = mod:get("toggle_divider")
+    local userToggledPrompt = mod:get("toggle_prompt")
+    local userToggledSkull = mod:get("toggle_skull")
+
+    -- #################################################################################
+    -- Hint Removal
+    -- Hints are the loading screen quotes.
+    -- #################################################################################
+    if userToggledHint then
+        mod:hook_safe(LoadingView, "_set_hint_text_opacity", function(self, opacity)
+            local widget = self._widgets_by_name.hint_text
+
+            --widget.alpha_multiplier = opacity
+            widget.alpha_multiplier = 0
+        end)
+    end
 
     -- #################################################################################
     -- Divider Removal
-    --  The little ---V--- thing between the next prompt and hints
+    -- Dividers are the little ---V--- thing between the next prompt and hints
     --  Definitions are stored in:       scripts/ui/views/loading_view/loading_view_definitions.lua
     --      Definitions are called and edited by init, which I hooked
     --      Replacing the texture with a blank path makes it default to a rectangle that gets colored in
     --      Making that color have 0 alpha makes it invisible
     -- #################################################################################
-    if mod:get("toggle_divider") then  
+    if userToggledDivider then
         mod:hook_safe(LoadingView, "init", function(self, settings, context)
-            self._entry_duration = nil
-	        self._text_cycle_duration = nil
-	        self._update_hint_text = nil
-
-	        local background, background_package = self:select_background()
-	        local definitions = require(definition_path)
-
-	        definitions.widget_definitions.title_divider_bottom = UIWidget.create_definition({
+            local background, background_package = self:select_background()
+            local definitions = require(definition_path)
+            
+            definitions.widget_definitions.title_divider_bottom = UIWidget.create_definition({
                 {
                     pass_type = "texture",
                     --value = "content/ui/materials/dividers/skull_rendered_center_02",
@@ -39,19 +57,16 @@ mod.on_all_mods_loaded = function()
                 },
             }, "title_divider_bottom"),
             
-	        LoadingView.super.init(self, definitions, settings, context, background_package)
-
-	        self._can_exit = context and context.can_exit
-	        self._pass_draw = false
-	        self._no_cursor = true
+            LoadingView.super.init(self, definitions, settings, context, background_package)
         end)
     end
+    
     -- #################################################################################
     -- Prompt Removal
     --  Replaces the [SPACE] Next prompt with an empty string
     --  Don't need to localize something that I'll just replace later, so the input key and text and commented out
     -- #################################################################################
-    if mod:get("toggle_prompt") then
+    if userToggledPrompt then
         mod:hook_safe(LoadingView, "_update_input_display", function(self)
             --local text = "loc_next"
             local widgets_by_name = self._widgets_by_name
@@ -66,6 +81,35 @@ mod.on_all_mods_loaded = function()
             text_widget.content.text = ""
         end)
     end
+
+    mod:hook_safe(UIManager, "render_loading_info", function(self)
+        local gui = self._ui_loading_icon_renderer.gui
+        --local gui = nil
+        local wait_reason, wait_time, text_opacity = self._loading_state_data:current_wait_info()
+
+        --self._loading_reason:render(gui, wait_reason, wait_time, text_opacity)
+        self._loading_reason:render(gui, "", wait_time, text_opacity)
+    end)
+
+    local font_options = {
+        shadow = true,
+    }
+    mod:hook_safe(LoadingReason, "_render_text", function(self, gui, anchor_x, anchor_y, resolution_scale, text, text_opacity)
+        --font_options.color = Color(text_opacity, 255, 235, 150)
+        font_options.color = Color(0, 255, 235, 150)
+
+    end)
+    -- EXPERIMENTS
+    -- What is overlay? setting it to 0 didn't seem to change anything
+    --[[
+        mod:hook_safe(LoadingView, "_set_overlay_opacity", function (self, opacity)
+    
+        local widget = self._widgets_by_name.overlay
+    
+        --widget.alpha_multiplier = opacity
+        widget.alpha_multiplier = 0
+    end)
+    ]]
 end
 
 -- #################################################################################
@@ -75,6 +119,7 @@ end
 --  Here you can see my descent into madness
 --  This is turning out really annoying to disable
 --  None of the code below this point will load into the game
+--      (and note to self, move this into the all mods loaded section once it works)
 -- ###########################
 --  "content/ui/materials/loading/loading_icon"
 --      Color:
@@ -89,6 +134,36 @@ end
 --          so making a small black box gets hidden on top of the skull
 --          the top left corner is the basis for position       
 -- #################################################################################
+if userToggledSkull then
+    -- Reserved
+end
+
+local LoadingIcon = require("scripts/ui/loading_icon")
+mod:hook_safe(LoadingIcon, "render", function(gui)
+    local resolution_width, resolution_height, resolution_scale = get_resolution()
+    local icon_width = 256 * resolution_scale
+    local icon_height = 256 * resolution_scale
+    --local icon_width = 0
+    --local icon_height = 0
+    local x_offset = -25 * resolution_scale
+    local y_offset = -25 * resolution_scale
+    local position = Vector3(x_offset + (resolution_width - icon_width), y_offset + (resolution_height - icon_height), 1000)
+    local icon_size = Vector2(icon_width, icon_height)
+
+    --Gui.bitmap(gui, "content/ui/materials/loading/loading_icon", position, icon_size, Color(255, 255, 255, 255))
+    --Gui.bitmap(gui, "", position, icon_size, Color(255, 255, 255, 255)) -- !!!!!!! creates a colored box
+    Gui.bitmap(gui, "", position, Vector2(15, 15), Color(255, 255, 255, 0))
+
+    --Gui.bitmap(gui, "content/ui/materials/loading/loading_icon", position, Vector2(1, 1), Color(255, 255, 255, 255)) -- trying to shrink it. defaults to icon
+    --Gui.bitmap(gui, "", position, Vector2(1, 1), Color(255, 255, 255, 255)) -- trying to shrink it. defaults to icon
+
+    --Gui.bitmap(gui, "content/ui/materials/loading/loading_icon", Vector3(999, 999, 999), icon_size, Color(255, 255, 255, 255)) -- trying to yeet it. defaults to icon
+    --Gui.bitmap(gui, "", Vector3(9999, 9999, 999), icon_size, Color(50, 255, 255, 255)) -- trying to yeet it. defaults to icon
+
+    --Gui.bitmap(gui, "", position, icon_size, Color(0, 0, 0, 0)) -- defaults to the actual icon
+    --Gui.bitmap(gui, "", position, Vector2(1, 1), Color(255, 0, 0, 0)) -- trying to shrink box to one pixel. defaults to icon
+    --Gui.bitmap(gui, "", position, Vector2(1, 1), Color(255, 255, 255, 255)) -- trying to shrink box to one pixel. defaults to icon
+end)
 --[[
 mod:hook_require("scripts/managers/ui/ui_manager", function(UIManager)
     
@@ -101,13 +176,13 @@ mod:hook_require("scripts/managers/ui/ui_manager", function(UIManager)
         --local gui = self._ui_loading_icon_renderer.gui
         local gui = nil
 
-	    Gui.rect(gui, Vector3.zero(), Vector3(RESOLUTION_LOOKUP.width, RESOLUTION_LOOKUP.height, 0), Color(255, 0, 0, 0))
+        Gui.rect(gui, Vector3.zero(), Vector3(RESOLUTION_LOOKUP.width, RESOLUTION_LOOKUP.height, 0), Color(255, 0, 0, 0))
     end)
     mod:hook_safe(UIManager, "render_loading_icon", function(self)
         --local gui = self._ui_loading_icon_renderer.gui
         local gui = nil
 
-	    self._loading_reason:render(gui, false)
+        self._loading_reason:render(gui, false)
     end)
     mod:hook_safe(UIManager, "render_loading_info", function(self)
         --local gui = self._ui_loading_icon_renderer.gui

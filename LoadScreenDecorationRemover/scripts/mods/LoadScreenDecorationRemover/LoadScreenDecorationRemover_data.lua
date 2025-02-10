@@ -1,7 +1,7 @@
 local mod = get_mod("LoadScreenDecorationRemover")
 
 local filledWidgets = {}
-local widgetNames = {"toggle_divider", "toggle_prompt"}
+local widgetNames = {"toggle_hint", "toggle_divider", "toggle_prompt", "toggle_skull"}
 --local widgetNames = {}
 
 -- Appends a toggleable option for a new widget
