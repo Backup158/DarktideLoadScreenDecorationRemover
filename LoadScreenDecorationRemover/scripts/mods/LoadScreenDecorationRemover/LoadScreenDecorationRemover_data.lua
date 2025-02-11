@@ -1,7 +1,8 @@
 local mod = get_mod("LoadScreenDecorationRemover")
 
 local filledWidgets = {}
-local widgetNames = {"toggle_hint", "toggle_divider", "toggle_prompt", "toggle_skull"}
+local widgetNames = {"toggle_hint", "toggle_divider", "toggle_prompt"}
+local widgetNamesDefaultFalse = {"toggle_skull"}
 --local widgetNames = {}
 
 -- Appends a toggleable option for a new widget
@@ -13,10 +14,20 @@ local function addWidget(name)
         default_value = true,
     }
 end
+local function addWidgetDefaultFalse(name)
+    filledWidgets[#filledWidgets + 1] = {
+        setting_id = name,
+        type = "checkbox",
+        default_value = false,
+    }
+end
 
 -- Adds a widget for each one in the list of names
 for _, name in pairs(widgetNames) do
     addWidget(name)
+end
+for _, name in pairs(widgetNamesDefaultFalse) do
+    addWidgetDefaultFalse(name)
 end
 
 return {
