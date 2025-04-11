@@ -1,5 +1,5 @@
 local mod = get_mod("LoadScreenDecorationRemover")
-mod.version = "1.0"
+mod.version = "1.0.1"
 -- Requirements for hint/divider/prompt
 local definition_path = "scripts/ui/views/loading_view/loading_view_definitions"
 local UIWidget = require("scripts/managers/ui/ui_widget")

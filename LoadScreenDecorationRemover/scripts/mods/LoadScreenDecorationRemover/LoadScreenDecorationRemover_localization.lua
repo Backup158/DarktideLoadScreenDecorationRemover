@@ -5,7 +5,7 @@ return {
     },
     mod_description = {
         en = "Removes non-background decorations from loading screens. Changes do NOT take effect until game restart/reload.",
-             ["zh-cn"] ="移除加载界面的非背景修饰。 修改将在游戏重启/重载后应用。",
+        ["zh-cn"] ="移除加载界面的非背景修饰。 修改将在游戏重启/重载后应用。",
     },
     toggle_hint = {
         en = "Hide Hint",
