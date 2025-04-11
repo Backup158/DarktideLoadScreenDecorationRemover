@@ -13,7 +13,7 @@ return {
     },
     toggle_hint_description = {
         en = "An open mind is like a fortress with its gates unbarred and unguarded.",
-        ["zh-cn"] = "",
+        ["zh-cn"] = "智而无信，神锋倒持。",
     },
     toggle_divider = {
         en = "Hide Divider",
