@@ -10,27 +10,17 @@ local LoadingReason = require("scripts/ui/loading_reason")
 -- For spinning skull
 local LoadingIcon = require("scripts/ui/loading_icon")
 
--- Mod locals
-local userToggledHint
-local userToggledDivider
-local userToggledPrompt
-local userToggledSkull
-
 -- #################################################################################
 --                              Hooker Removal
 -- NOTE: Using conditionals inside a hook causes a syntax error. I think it's because of the 'end' of the if being confused for the 'end)' of the hook arguments
 -- #################################################################################
 local function hook_the_boys()
-    userToggledHint = mod:get("toggle_hint")
-    userToggledDivider = mod:get("toggle_divider")
-    userToggledPrompt = mod:get("toggle_prompt")
-    userToggledSkull = mod:get("toggle_skull")
 
     -- #################################################################################
     -- Hint Removal
     -- Hints are the loading screen quotes.
     -- #################################################################################
-    if userToggledHint then
+    if mod:get("toggle_hint") then
         mod:hook_safe(LoadingView, "_set_hint_text_opacity", function(self, opacity)
             local widget = self._widgets_by_name.hint_text
 
@@ -47,7 +37,7 @@ local function hook_the_boys()
     --      Replacing the texture with a blank path makes it default to a rectangle that gets colored in
     --      Making that color have 0 alpha makes it invisible
     -- #################################################################################
-    if userToggledDivider then
+    if mod:get("toggle_divider") then
         -- Hook happens before the main body and may not always happen
         -- vs safe hook, to go back remove the func
         mod:hook(LoadingView, "init", function(func, self, settings, context)
@@ -83,7 +73,7 @@ local function hook_the_boys()
     --  Replaces the [SPACE] Next prompt with an empty string
     --  Hook safe 
     -- #################################################################################
-    if userToggledPrompt then
+    if mod:get("toggle_prompt") then
         mod:hook_safe(LoadingView, "_update_input_display", function(self)
             --local text = "loc_next"
             local widgets_by_name = self._widgets_by_name
@@ -117,7 +107,7 @@ local function hook_the_boys()
     -- Spinning Skull Removal
     -- On the loading screens ONLY
     -- #################################################################################
-    if userToggledSkull then
+    if mod:get("toggle_skull") then
         mod:hook_origin(LoadingReason, "_render_icon", function(self, gui, anchor_x, anchor_y, resolution_scale)
             return
         end)
@@ -127,6 +117,17 @@ end
 -- #################################################################################
 --                              Calling Hooks
 -- #################################################################################
+local function find_which_hook_to_affect(setting_id)
+    -- so this table will be made every time you change settings, but i think that's fine vs having it always exist as the mod runs
+    local setting_and_hook_pairs = {
+        toggle_hint = "LoadingView._set_hint_text_opacity",
+        toggle_divider = "LoadingView.init",
+        toggle_prompt = "LoadingView._update_input_display",
+        -- hook origin can't be rehooked, so forget this for the skull
+    }
+    return setting_and_hook_pairs[setting_id]
+end
+
 mod.on_all_mods_loaded = function()
     mod:info("LoadScreenDecorationRemover v" .. mod.version .. " loaded uwu nya :3")
     
@@ -134,6 +135,17 @@ mod.on_all_mods_loaded = function()
 end
 
 mod.on_setting_changed = function(setting_id)
-    mod:disable_all_hooks()
+    if setting_id == "toggle_skull" then return end
+
+    local setting_changed_to = mod:get(setting_id)
+    --mod:echo(setting_id.." changed to "..tostring(setting_changed_to))
+    local hook_to_affect = find_which_hook_to_affect(setting_id)
+    --mod:echo(hook_to_affect.." affected")
+    -- if setting was enabled and is now disabled (which means show the thing again)
+    if not setting_changed_to then
+        mod:hook_disable(hook_to_affect)
+    else
+        mod:hook_enable(hook_to_affect)
+    end
     hook_the_boys()
 end
