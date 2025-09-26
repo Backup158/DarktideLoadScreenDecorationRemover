@@ -147,5 +147,4 @@ mod.on_setting_changed = function(setting_id)
     else
         mod:hook_enable(hook_to_affect)
     end
-    hook_the_boys()
 end
