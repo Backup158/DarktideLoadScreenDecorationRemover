@@ -1,5 +1,6 @@
 local mod = get_mod("LoadScreenDecorationRemover")
 mod.version = "1.0.1"
+
 -- Requirements for hint/divider/prompt
 local definition_path = "scripts/ui/views/loading_view/loading_view_definitions"
 local UIWidget = require("scripts/managers/ui/ui_widget")
@@ -9,16 +10,21 @@ local LoadingReason = require("scripts/ui/loading_reason")
 -- For spinning skull
 local LoadingIcon = require("scripts/ui/loading_icon")
 
+-- Mod locals
+local userToggledHint
+local userToggledDivider
+local userToggledPrompt
+local userToggledSkull
+
 -- #################################################################################
 --                              Hooker Removal
 -- NOTE: Using conditionals inside a hook causes a syntax error. I think it's because of the 'end' of the if being confused for the 'end)' of the hook arguments
 -- #################################################################################
-mod.on_all_mods_loaded = function()
-    mod:info("LoadScreenDecorationRemover v" .. mod.version .. " loaded uwu nya :3")
-    local userToggledHint = mod:get("toggle_hint")
-    local userToggledDivider = mod:get("toggle_divider")
-    local userToggledPrompt = mod:get("toggle_prompt")
-    local userToggledSkull = mod:get("toggle_skull")
+local function hook_the_boys()
+    userToggledHint = mod:get("toggle_hint")
+    userToggledDivider = mod:get("toggle_divider")
+    userToggledPrompt = mod:get("toggle_prompt")
+    userToggledSkull = mod:get("toggle_skull")
 
     -- #################################################################################
     -- Hint Removal
@@ -116,6 +122,18 @@ mod.on_all_mods_loaded = function()
             return
         end)
     end
-
 end
 
+-- #################################################################################
+--                              Calling Hooks
+-- #################################################################################
+mod.on_all_mods_loaded = function()
+    mod:info("LoadScreenDecorationRemover v" .. mod.version .. " loaded uwu nya :3")
+    
+    hook_the_boys()
+end
+
+mod.on_setting_changed = function(setting_id)
+    mod:disable_all_hooks()
+    hook_the_boys()
+end
