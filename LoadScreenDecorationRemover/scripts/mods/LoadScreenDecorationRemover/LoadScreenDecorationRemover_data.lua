@@ -6,28 +6,21 @@ local widgetNamesDefaultFalse = {"toggle_skull"}
 --local widgetNames = {}
 
 -- Appends a toggleable option for a new widget
-local function addWidget(name)
+local function addWidget(name, truth)
     -- Write at (table size) + 1, ie inserting at the tail
     filledWidgets[#filledWidgets + 1] = {
         setting_id = name,
         type = "checkbox",
-        default_value = true,
-    }
-end
-local function addWidgetDefaultFalse(name)
-    filledWidgets[#filledWidgets + 1] = {
-        setting_id = name,
-        type = "checkbox",
-        default_value = false,
+        default_value = truth,
     }
 end
 
 -- Adds a widget for each one in the list of names
 for _, name in pairs(widgetNames) do
-    addWidget(name)
+    addWidget(name, true)
 end
 for _, name in pairs(widgetNamesDefaultFalse) do
-    addWidgetDefaultFalse(name)
+    addWidgetDefaultFalse(name, false)
 end
 
 return {
