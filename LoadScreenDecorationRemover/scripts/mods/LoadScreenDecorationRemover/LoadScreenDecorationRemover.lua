@@ -138,12 +138,12 @@ mod.on_all_mods_loaded = function()
 end
 
 mod.on_setting_changed = function(setting_id)
+    -- cant disable hook_origin, so skip
     if setting_id == "toggle_skull" then return end
 
     local setting_changed_to = mod:get(setting_id)
-    --mod:echo(setting_id.." changed to "..tostring(setting_changed_to))
     local hook_to_affect = find_which_hook_to_affect(setting_id)
-    --mod:echo(hook_to_affect.." affected")
+
     -- if setting was enabled and is now disabled (which means show the thing again)
     if not setting_changed_to then
         mod:hook_disable(LoadingView, hook_to_affect)
