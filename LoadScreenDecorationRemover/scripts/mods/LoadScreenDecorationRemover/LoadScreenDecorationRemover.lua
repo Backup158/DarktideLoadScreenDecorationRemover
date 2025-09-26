@@ -42,7 +42,9 @@ mod.on_all_mods_loaded = function()
     --      Making that color have 0 alpha makes it invisible
     -- #################################################################################
     if userToggledDivider then
-        mod:hook_safe(LoadingView, "init", function(self, settings, context)
+        -- Hook happens before the main body and may not always happen
+        -- vs safe hook, to go back remove the func
+        mod:hook(LoadingView, "init", function(func, self, settings, context)
             --self._entry_duration = nil
             --self._text_cycle_duration = nil
             --self._update_hint_text = nil
@@ -60,7 +62,7 @@ mod.on_all_mods_loaded = function()
                         color = Color.white(0, true),
                     },
                 },
-            }, "title_divider_bottom"),
+            }, "title_divider_bottom")
             
             LoadingView.super.init(self, definitions, settings, context, background_package)
 
