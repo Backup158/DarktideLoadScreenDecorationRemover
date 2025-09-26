@@ -13,6 +13,7 @@ local LoadingIcon = require("scripts/ui/loading_icon")
 -- #################################################################################
 --                              Hooker Removal
 -- NOTE: Using conditionals inside a hook causes a syntax error. I think it's because of the 'end' of the if being confused for the 'end)' of the hook arguments
+-- Hooks all the releva
 -- #################################################################################
 local function hook_the_boys()
 
@@ -37,37 +38,38 @@ local function hook_the_boys()
     --      Definitions are called and edited by init, which I hooked
     --      Replacing the texture with a blank path makes it default to a rectangle that gets colored in
     --      Making that color have 0 alpha makes it invisible
+    -- Hook
+    --  Hook happens before the main body and may not always happen
+    --  vs safe hook, to go back remove the func
+    --  chosen to avoid the black background
     -- #################################################################################
-    -- Hook happens before the main body and may not always happen
-    -- vs safe hook, to go back remove the func
-    mod:hook(LoadingView, "init", function(func, self, settings, context)
-        --self._entry_duration = nil
-        --self._text_cycle_duration = nil
-        --self._update_hint_text = nil
+    if mod:get("toggle_divider") then
+        mod:hook(LoadingView, "init", function(func, self, settings, context)
+            --self._entry_duration = nil
+            --self._text_cycle_duration = nil
+            --self._update_hint_text = nil
 
-        local background, background_package = self:select_background()
-        local definitions = require(definition_path)
-        
-        definitions.widget_definitions.title_divider_bottom = UIWidget.create_definition({
-            {
-                pass_type = "texture",
-                --value = "content/ui/materials/dividers/skull_rendered_center_02",
-                value = "",
-                style = {
-                    -- color = Color.white(255, true),
-                    color = Color.white(0, true),
+            local background, background_package = self:select_background()
+            local definitions = require(definition_path)
+            
+            definitions.widget_definitions.title_divider_bottom = UIWidget.create_definition({
+                {
+                    pass_type = "texture",
+                    --value = "content/ui/materials/dividers/skull_rendered_center_02",
+                    value = "",
+                    style = {
+                        -- color = Color.white(255, true),
+                        color = Color.white(0, true),
+                    },
                 },
-            },
-        }, "title_divider_bottom")
-        
-        LoadingView.super.init(self, definitions, settings, context, background_package)
+            }, "title_divider_bottom")
+            
+            LoadingView.super.init(self, definitions, settings, context, background_package)
 
-        --self._can_exit = context and context.can_exit
-        --self._pass_draw = false
-        --self._no_cursor = true
-    end)
-    if not mod:get("toggle_divider") then
-        mod:hook_disable(LoadingView, "init")
+            --self._can_exit = context and context.can_exit
+            --self._pass_draw = false
+            --self._no_cursor = true
+        end)
     end
     
     -- #################################################################################
@@ -124,7 +126,7 @@ local function find_which_hook_to_affect(setting_id)
     -- so this table will be made every time you change settings, but i think that's fine vs having it always exist as the mod runs
     local setting_and_hook_pairs = {
         toggle_hint = "_set_hint_text_opacity",
-        toggle_divider = "init",
+        --toggle_divider = "init", -- only runs on startup so it doesn't matter
         toggle_prompt = "_update_input_display",
         -- hook origin can't be rehooked, so forget this for the skull
     }
@@ -139,7 +141,7 @@ end
 
 mod.on_setting_changed = function(setting_id)
     -- cant disable hook_origin, so skip
-    if setting_id == "toggle_skull" then return end
+    if (setting_id == "toggle_skull") or (setting_id == "toggle_divider") then return end
 
     local setting_changed_to = mod:get(setting_id)
     local hook_to_affect = find_which_hook_to_affect(setting_id)
