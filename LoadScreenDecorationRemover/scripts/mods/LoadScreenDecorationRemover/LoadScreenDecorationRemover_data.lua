@@ -18,18 +18,18 @@ local function add_group_widget(name)
     filled_widgets[#filled_widgets + 1] = {
         setting_id = name,
         type = "group",
-        sub_widgets = P{},
+        sub_widgets = {},
     }
 end
 
 -- Adds a widget for each one in the list of names
 add_group_widget("toggleable_during_game")
-add_widget_to_group("toggle_hint", filled_widgets.toggleable_during_game, true)
-add_widget_to_group("toggle_prompt", filled_widgets.toggleable_during_game, true)
+add_widget_to_group("toggle_hint", filled_widgets[1].sub_widgets, true)
+add_widget_to_group("toggle_prompt", filled_widgets[1].sub_widgets, true)
 
 add_group_widget("requires_restart")
-add_widget_to_group("toggle_divider", filled_widgets.requires_restart, true)
-add_widget_to_group("toggle_skull", filled_widgets.requires_restart, false)
+add_widget_to_group("toggle_divider", filled_widgets[2].sub_widgets, true)
+add_widget_to_group("toggle_skull", filled_widgets[2].sub_widgets, false)
 
 return {
     name = mod:localize("mod_name"),
