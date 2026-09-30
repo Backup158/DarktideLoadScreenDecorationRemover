@@ -1,3 +1,8 @@
+# 1.1.1 - 2026-09-29
+## Added
+- `ru` localization (thanks xsSplater!)
+- JSON Metadata file
+
 # 2025-09-26: Bound by Duty
 v1.1.0
 
