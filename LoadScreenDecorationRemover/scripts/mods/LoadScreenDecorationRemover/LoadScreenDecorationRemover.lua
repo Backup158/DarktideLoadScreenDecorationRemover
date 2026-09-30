@@ -1,5 +1,4 @@
 local mod = get_mod("LoadScreenDecorationRemover")
-mod.version = "1.1.0"
 
 -- Requirements for hint/divider/prompt
 local definition_path = "scripts/ui/views/loading_view/loading_view_definitions"
@@ -134,8 +133,6 @@ local function find_which_hook_to_affect(setting_id)
 end
 
 mod.on_all_mods_loaded = function()
-    mod:info("LoadScreenDecorationRemover v" .. mod.version .. " loaded uwu nya :3")
-    
     hook_the_boys()
 end
 

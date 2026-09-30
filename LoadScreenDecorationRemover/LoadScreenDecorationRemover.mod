@@ -8,5 +8,6 @@ return {
 			mod_localization = "LoadScreenDecorationRemover/scripts/mods/LoadScreenDecorationRemover/LoadScreenDecorationRemover_localization",
 		})
 	end,
+	version = "1.1.1",
 	packages = {},
 }
