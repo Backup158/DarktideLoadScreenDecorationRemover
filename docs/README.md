@@ -24,3 +24,7 @@ By default, I left the spinning skull on, since it makes it pretty obvious if th
 Install like any other mod. The mod is load order agnostic.
 
 See the [DMF guide](https://dmf-docs.darkti.de/#/installing-mods) for manual installation.
+
+# Acknowledgements
+- RinAnarchy: for zh-cn localization
+- xsSplater: for ru localization
